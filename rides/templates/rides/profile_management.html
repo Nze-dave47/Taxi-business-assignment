@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Profile Management — Simple Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  {% include 'rides/includes/brand_css.html' %}
+</head>
+<body class="min-h-screen brand-bg">
+  <main class="mx-auto max-w-3xl px-4 py-12">
+    <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-2xl">
+      <h1 class="text-2xl font-semibold text-on-brand">Profile management</h1>
+      <p class="mt-2 text-sm text-slate-400">Update your name, change password, or upload a profile picture.</p>
+
+      <form method="post" enctype="multipart/form-data" class="mt-6 space-y-6">
+        {% csrf_token %}
+        <div class="grid gap-4 sm:grid-cols-2">
+          {{ user_form.first_name.label_tag }}
+          {{ user_form.first_name }}
+          {{ user_form.last_name.label_tag }}
+          {{ user_form.last_name }}
+          {{ user_form.email.label_tag }}
+          {{ user_form.email }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Profile picture</label>
+          {{ profile_form.profile_picture }}
+          {% if request.user.profile.profile_picture %}
+            <div class="mt-3">
+              <img src="{{ request.user.profile.profile_picture.url }}" alt="Profile picture" class="h-24 w-24 rounded-full object-cover">
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="pt-4 border-t border-white/6">
+          <h2 class="text-lg font-semibold text-white">Change password</h2>
+          <p class="text-sm text-slate-400">Leave blank to keep your current password.</p>
+          <div class="mt-3 grid gap-3">
+            {{ password_form.old_password.label_tag }}
+            {{ password_form.old_password }}
+            {{ password_form.new_password1.label_tag }}
+            {{ password_form.new_password1 }}
+            {{ password_form.new_password2.label_tag }}
+            {{ password_form.new_password2 }}
+          </div>
+        </div>
+
+        <div class="pt-6">
+          <button type="submit" class="btn-cta">Save changes</button>
+          <a href="{% url 'dashboard' %}" class="ml-3 btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

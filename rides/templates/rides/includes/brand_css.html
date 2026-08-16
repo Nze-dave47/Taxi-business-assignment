@@ -1,0 +1,35 @@
+<style>
+:root{
+  --taxi-vibrant:#FF7A00; /* dark orange */
+  --traffic-lime:#9AE600; /* vivid lime but slightly less neon */
+  --traffic-vibrant:#00C853; /* primary green */
+  --taxi-gold:#B57A00; /* richer gold */
+  --taxi-light:#FFEAA3; /* warmer light taxi */
+  --traffic-forest:#064823; /* darker forest for text */
+}
+
+/* Page background: richer yellow fading into green — thicker yellow for contrast */
+.brand-bg{background:linear-gradient(180deg, #FFF0C2 0%, var(--taxi-vibrant) 28%, #E7FFB8 100%); color:var(--traffic-forest);}
+
+/* Header background: add green accent to header gradient */
+.header-bg{background:linear-gradient(90deg, rgba(255,179,0,0.18), rgba(0,200,83,0.06)); backdrop-filter:blur(6px)}
+
+/* Lightweight panels: give panels a soft warm surface with a subtle green tint */
+.brand-panel{background:linear-gradient(180deg,#fffdf2,#f9f6e7);border-radius:1.25rem;padding:1.5rem;box-shadow:0 12px 36px rgba(3,7,18,0.06);color:var(--traffic-forest)}
+
+/* Buttons: stronger green CTA and warmer yellow secondary */
+.btn-cta{background:linear-gradient(90deg,var(--traffic-vibrant),#009944);color:#fff;font-weight:800;padding:.6rem 1rem;border-radius:.75rem;box-shadow:0 8px 20px rgba(0,200,83,0.12)}
+.btn-secondary{background:var(--taxi-vibrant);color:#082810;font-weight:800;padding:.55rem 1rem;border-radius:.75rem;border:1px solid rgba(0,0,0,0.04)}
+
+/* Animations */
+@keyframes button-pop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+.animate-button-pop:hover{animation:button-pop 260ms cubic-bezier(.2,.8,.2,1)}
+@keyframes subtle-pulse{0%{box-shadow:0 0 0 0 rgba(164,255,0,0.28)}60%{box-shadow:0 0 0 8px rgba(164,255,0,0.04)}100%{box-shadow:0 0 0 0 rgba(164,255,0,0)}}
+.animate-subtle-pulse{animation:subtle-pulse 2s infinite}
+
+/* Small utility */
+.brand-heading{color:var(--taxi-gold)}
+/* Semantic text colors */
+.text-on-brand{color:var(--traffic-forest) !important}
+.text-on-inverse{color:#ffffff !important}
+</style>

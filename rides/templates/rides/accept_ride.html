@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Incoming Ride Request — Simple Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  {% include 'rides/includes/brand_css.html' %}
+
+  <style>
+    :root{--taxi-vibrant:#FFC107;--traffic-lime:#A4FF00;--traffic-vibrant:#00C853;--taxi-gold:#B8860B;--taxi-light:#FFF8E1;--traffic-forest:#0B6623}
+    @keyframes button-pop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+    .animate-button-pop:hover{animation:button-pop 260ms cubic-bezier(.2,.8,.2,1)}
+    .btn-cta{background:linear-gradient(90deg,var(--traffic-vibrant),var(--traffic-forest));color:#fff;font-weight:700;padding:.8rem 1.2rem;border-radius:.9rem}
+    .btn-secondary{background:var(--taxi-light);color:var(--taxi-gold);font-weight:700;padding:.6rem 1rem;border-radius:.75rem}
+    .brand-panel{background:linear-gradient(180deg,rgba(0,0,0,0.28),rgba(0,0,0,0.18));box-shadow:0 16px 40px rgba(3,7,18,0.6);border-radius:1.25rem;padding:2rem}
+  </style>
+</head>
+<body class="min-h-screen brand-bg">
+  <div class="flex min-h-screen items-center justify-center px-4 py-12">
+    <div class="w-full max-w-3xl brand-panel">
+      <div class="text-center">
+        <p class="text-sm font-semibold uppercase tracking-[0.32em] text-[var(--taxi-gold)]">Incoming ride request</p>
+        <h1 class="mt-6 text-4xl font-semibold text-white">Ride request from {{ booking.passenger.username }}</h1>
+        <p class="mt-4 text-base leading-7 text-slate-200">You have one new booking waiting. Accept it to start the ride or decline if you cannot take it.</p>
+      </div>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
+        <form method="post" action="{% url 'accept_ride' %}" class="rounded-[1.5rem] p-4">
+          {% csrf_token %}
+          <input type="hidden" name="booking_id" value="{{ booking.id }}" />
+          <button type="submit" class="w-full btn-cta animate-button-pop">Accept Ride</button>
+        </form>
+
+        <form method="post" action="{% url 'driver_offer_decline' booking_id=booking.id %}" class="rounded-[1.5rem] p-4">
+          {% csrf_token %}
+          <button type="submit" class="w-full btn-secondary animate-button-pop">Decline</button>
+        </form>
+      </div>
+
+      <div class="mt-10 text-center text-sm text-slate-400">
+        Booking #{{ booking.id }} • Passenger: {{ booking.passenger.username }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign in — Nze David's Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* subtle backdrop blur for premium feel */
+    .backdrop-blur {
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 min-h-screen flex items-center justify-center text-slate-100">
+  <div class="absolute inset-0 opacity-30" aria-hidden="true"></div>
+
+  <main class="relative z-10 w-full max-w-md mx-auto p-6">
+    <div class="bg-gradient-to-br from-white/6 to-white/3 border border-white/6 rounded-2xl shadow-2xl backdrop-blur overflow-hidden">
+      <div class="px-8 py-10">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight">Welcome back</h1>
+            <p class="text-sm text-slate-300">Sign in</p>
+          </div>
+          <div class="h-10 w-10 bg-gradient-to-tr from-indigo-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">🚕</div>
+        </div>
+
+        <form method="post" action="{% url 'login' %}" class="space-y-5">
+          {% csrf_token %}
+
+          {% if form.errors %}
+            <div class="p-3 rounded-md bg-red-700/20 border border-red-700/30 text-red-100">
+              <strong class="block">Sign in failed</strong>
+              <ul class="mt-1 list-disc list-inside text-sm">
+                {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <div>
+            <label for="id_username" class="block text-sm font-medium text-slate-200">Username</label>
+            <div class="mt-1">
+              <input id="id_username" name="username" type="text" required autofocus
+                     class="w-full rounded-xl border border-transparent bg-white/6 px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow" />
+            </div>
+          </div>
+
+          <div>
+            <label for="id_password" class="block text-sm font-medium text-slate-200">Password</label>
+            <div class="mt-1">
+              <input id="id_password" name="password" type="password" required
+                     class="w-full rounded-xl border border-transparent bg-white/6 px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="inline-flex items-center text-sm text-slate-300">
+              <input type="checkbox" name="remember" class="h-4 w-4 rounded text-indigo-500 bg-slate-800 border-slate-600">
+              <span class="ml-2">Remember me</span>
+            </label>
+            <div>
+              <a href="#" class="text-sm text-indigo-300 hover:text-indigo-100">Forgot password?</a>
+            </div>
+          </div>
+
+          <div>
+            <button type="submit" class="w-full rounded-xl py-3 bg-gradient-to-r from-indigo-600 to-pink-500 text-white font-semibold shadow hover:from-indigo-700 hover:to-pink-600 transition">Sign in</button>
+          </div>
+        </form>
+      </div>
+      <div class="px-8 py-4 bg-white/3 text-sm text-slate-300 text-center">By signing in you agree to the project's demo terms.</div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="refresh" content="3">
+  <title>Ride Status — Simple Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  {% include 'rides/includes/brand_css.html' %}
+
+  <style>
+    :root{--taxi-vibrant:#FFC107;--traffic-lime:#A4FF00;--traffic-vibrant:#00C853;--taxi-gold:#B8860B;--taxi-light:#FFF8E1;--traffic-forest:#0B6623}
+    @keyframes button-pop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+    .animate-button-pop:hover{animation:button-pop 260ms cubic-bezier(.2,.8,.2,1)}
+    @keyframes subtle-pulse{0%{box-shadow:0 0 0 0 rgba(164,255,0,0.28)}60%{box-shadow:0 0 0 8px rgba(164,255,0,0.04)}100%{box-shadow:0 0 0 0 rgba(164,255,0,0)}}
+    .animate-subtle-pulse{animation:subtle-pulse 2s infinite}
+    .btn-cta{background:linear-gradient(90deg,var(--traffic-vibrant),var(--traffic-forest));color:#fff;font-weight:700;padding:.6rem 1rem;border-radius:.75rem}
+    .btn-secondary{background:var(--taxi-light);color:var(--taxi-gold);font-weight:700;padding:.55rem 1rem;border-radius:.75rem}
+  </style>
+</head>
+<body class="min-h-screen brand-bg">
+  <div class="flex min-h-screen items-center justify-center p-6">
+    <div class="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
+      {# Show recent audit notification if present (accepted/declined) #}
+      {% if audits and audits.0 %}
+        {% with latest_audit=audits.0 %}
+          {% if latest_audit.action == 'booking_accepted' %}
+            <div class="mb-4 rounded-lg border border-emerald-600/20 bg-emerald-600/10 p-4 text-emerald-100">
+              <strong class="font-semibold">Good news:</strong>
+              <span class="ml-2">Your driver has accepted the ride. The trip is now active.</span>
+            </div>
+          {% elif latest_audit.action == 'booking_declined' %}
+            <div class="mb-4 rounded-lg border border-rose-600/20 bg-rose-600/10 p-4 text-rose-100">
+              <strong class="font-semibold">Update:</strong>
+              <span class="ml-2">Your ride request was declined. Please try booking another driver.</span>
+            </div>
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+
+      {% if booking %}
+        {% if booking.status == 'PENDING' %}
+          <div class="inline-flex rounded-full border border-[rgba(255,193,7,0.2)] bg-[rgba(255,193,7,0.06)] px-3 py-1 text-sm font-medium text-[var(--taxi-gold)]">Finding your driver...</div>
+          <h1 class="mt-6 text-3xl font-semibold text-white">Finding your driver...</h1>
+          <p class="mt-3 text-lg text-slate-300">We're still matching you with an available driver. This page will refresh automatically.</p>
+          <div class="mt-4">
+            <form method="POST" action="{% url 'cancel_booking' booking.id %}" class="mt-4">
+              {% csrf_token %}
+              <button type="submit" class="w-full py-3 px-4 rounded-xl font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors">
+                Cancel Ride Request
+              </button>
+            </form>
+          </div>
+        {% elif booking.status == 'ACTIVE' %}
+          <div class="inline-flex rounded-full border border-[rgba(0,200,83,0.14)] bg-[rgba(0,200,83,0.06)] px-3 py-1 text-sm font-medium text-[var(--traffic-forest)] animate-subtle-pulse">Driver on the way</div>
+          <h1 class="mt-6 text-3xl font-semibold text-white">Driver {{ booking.driver.username }} accepted your ride and is on the way!</h1>
+          <p class="mt-3 text-lg text-slate-300">Please be ready at the pickup location.</p>
+          <div class="mt-4">
+            <form method="POST" action="{% url 'cancel_booking' booking.id %}" class="mt-4">
+              {% csrf_token %}
+              <button type="submit" class="w-full py-3 px-4 rounded-xl font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors">
+                Cancel Ride
+              </button>
+            </form>
+          </div>
+        {% elif booking.status == 'CANCELLED' %}
+          <div class="inline-flex rounded-full border border-[rgba(220,38,38,0.14)] bg-[rgba(220,38,38,0.06)] px-3 py-1 text-sm font-medium text-rose-300">Ride cancelled</div>
+          <h1 class="mt-6 text-3xl font-semibold text-white">Your ride was declined/cancelled.</h1>
+          <p class="mt-3 text-lg text-slate-300">You can try booking another driver now.</p>
+          <div class="mt-6">
+            <a href="{% url 'passenger_booking' %}" class="btn-cta animate-button-pop">Book Again</a>
+          </div>
+        {% else %}
+          <div class="inline-flex rounded-full border border-slate-500/30 bg-slate-500/10 px-3 py-1 text-sm font-medium text-slate-300">Booking update</div>
+          <h1 class="mt-6 text-3xl font-semibold text-white">Booking status: {{ booking.status }}</h1>
+          <p class="mt-3 text-lg text-slate-300">No further action is required right now.</p>
+        {% endif %}
+      {% else %}
+        <div class="inline-flex rounded-full border border-slate-500/30 bg-slate-500/10 px-3 py-1 text-sm font-medium text-slate-300">No booking</div>
+        <h1 class="mt-6 text-3xl font-semibold text-white">No recent booking found.</h1>
+        <p class="mt-3 text-lg text-slate-300">Visit the booking page to request a ride.</p>
+        <div class="mt-6">
+          <a href="{% url 'passenger_booking' %}" class="btn-cta animate-button-pop">Book a ride</a>
+        </div>
+      {% endif %}
+      </div>
+  </div>
+
+  <script>
+    // Force auto-reload every 3 seconds universally across Chrome, Edge, and mobile
+    setTimeout(function() {
+      window.location.reload();
+    }, 3000);
+  </script>
+</body>
+</html>

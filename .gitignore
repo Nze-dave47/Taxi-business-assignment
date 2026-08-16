@@ -1,0 +1,48 @@
+# Python bytecode and tooling
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+
+# Django local data and secrets
+db.sqlite3
+*.sqlite3
+.env
+.env.*
+!.env.example
+local_settings.py
+
+# User uploads and runtime output
+media/
+profile_pics/
+logs/
+*.log
+
+# Static-file build output
+staticfiles/
+
+# Generated repository bundles
+repomix-output.xml
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db

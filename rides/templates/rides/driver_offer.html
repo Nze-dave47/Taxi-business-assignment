@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="refresh" content="3">
+  <title>New Ride Offer — Nze David's Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  {% include 'rides/includes/brand_css.html' %}
+
+  <style>
+    :root{--taxi-vibrant:#FFC107;--traffic-lime:#A4FF00;--traffic-vibrant:#00C853;--taxi-gold:#B8860B;--taxi-light:#FFF8E1;--traffic-forest:#0B6623}
+    @keyframes button-pop{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+    .animate-button-pop:hover{animation:button-pop 260ms cubic-bezier(.2,.8,.2,1)}
+    @keyframes subtle-pulse{0%{box-shadow:0 0 0 0 rgba(164,255,0,0.28)}60%{box-shadow:0 0 0 8px rgba(164,255,0,0.04)}100%{box-shadow:0 0 0 0 rgba(164,255,0,0)}}
+    .animate-subtle-pulse{animation:subtle-pulse 2s infinite}
+    .btn-cta{background:linear-gradient(90deg,var(--traffic-vibrant),var(--traffic-forest));color:#fff;font-weight:700;padding:.8rem 1.2rem;border-radius:.9rem}
+    .btn-secondary{background:var(--taxi-light);color:var(--taxi-gold);font-weight:700;padding:.8rem 1.2rem;border-radius:.9rem}
+  </style>
+</head>
+<body class="min-h-screen brand-bg">
+  <div class="flex min-h-screen items-center justify-center p-6">
+    <div class="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
+      <div class="flex justify-end mb-2">
+        <a href="{% url 'profile_management' %}" class="inline-flex items-center rounded px-3 py-1 text-sm font-medium text-slate-200 hover:bg-white/5">Manage profile</a>
+      </div>
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for message in messages %}
+            <div class="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-amber-100">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="inline-flex rounded-full border border-[rgba(0,200,83,0.12)] bg-[rgba(0,200,83,0.06)] px-3 py-1 text-sm font-medium text-[var(--traffic-forest)] animate-subtle-pulse">New offer</div>
+      <h1 class="mt-6 text-3xl font-semibold text-white">A new ride request has arrived.</h1>
+      <p class="mt-3 text-slate-300">You have been offered a ride from passenger <strong>{{ booking.passenger.username }}</strong>.</p>
+
+      <div class="mt-8 grid gap-4 sm:grid-cols-2">
+        <form method="post" action="{% url 'accept_ride' booking_id=booking.id %}" class="rounded-[1.5rem] p-4">
+          {% csrf_token %}
+          <button type="submit" class="w-full btn-cta animate-button-pop">Accept Ride</button>
+        </form>
+
+        <form method="post" action="{% url 'decline_ride' booking_id=booking.id %}" class="rounded-[1.5rem] p-4">
+          {% csrf_token %}
+          <button type="submit" class="w-full btn-secondary animate-button-pop">Decline Ride</button>
+        </form>
+      </div>
+
+      <div class="mt-6 text-sm text-slate-400">Booking #{{ booking.id }} • Pickup: {{ booking.pickup_time|date:'M d, Y H:i' }}</div>
+    </div>
+  </div>
+
+  <script>
+    // Force auto-reload every 3 seconds universally across Chrome, Edge, and mobile
+    setTimeout(function() {
+      window.location.reload();
+    }, 3000);
+  </script>
+</body>
+</html>

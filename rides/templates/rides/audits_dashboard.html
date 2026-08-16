@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Audits — Simple Taxi Business</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  {% include 'rides/includes/brand_css.html' %}
+
+  <style>
+    :root{--taxi-vibrant:#FFC107;--traffic-vibrant:#00C853;--taxi-gold:#B8860B}
+    .brand-heading{color:var(--taxi-gold)}
+    a.audit-link{color:var(--traffic-vibrant);font-weight:600}
+    .panel{background:linear-gradient(180deg,#fff,#fff);border-radius:.75rem;box-shadow:0 8px 30px rgba(3,7,18,0.06)}
+  </style>
+</head>
+<body style="background:linear-gradient(180deg, #FEF9E7, #F7F7F4); color:#0f172a">
+  <div class="p-6 max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4 brand-heading">Recent Audits</h1>
+    <div class="overflow-x-auto panel">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600">Timestamp</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600">Action</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600">Actor</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600">Booking</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-slate-600">Details</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for a in audits %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 text-sm text-slate-600">{{ a.timestamp }}</td>
+              <td class="px-4 py-3 text-sm font-medium">{{ a.action }}</td>
+              <td class="px-4 py-3 text-sm">{{ a.actor.username if a.actor else 'System' }}</td>
+              <td class="px-4 py-3 text-sm">{% if a.booking %}<a href="{% url 'ride_status_detail' a.booking.id %}" class="audit-link">#{{ a.booking.id }}</a>{% else %}-{% endif %}</td>
+              <td class="px-4 py-3 text-sm text-slate-600">{{ a.details }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
