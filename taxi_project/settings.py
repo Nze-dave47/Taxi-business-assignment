@@ -40,11 +40,16 @@ ALLOWED_HOSTS = [
 
 # Needed when the app is behind Render, Railway, or another HTTPS-terminating proxy.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = os.environ.get(
-    'SECURE_SSL_REDIRECT', str(not DEBUG)
-).lower() in ('1', 'true', 'yes', 'on')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+
+def environment_bool(name, default):
+    return os.environ.get(name, str(default)).lower() in ('1', 'true', 'yes', 'on')
+
+
+# Secure flags default to on in production and off for local HTTP development.
+SECURE_SSL_REDIRECT = environment_bool('SECURE_SSL_REDIRECT', not DEBUG)
+SESSION_COOKIE_SECURE = environment_bool('SESSION_COOKIE_SECURE', not DEBUG)
+CSRF_COOKIE_SECURE = environment_bool('CSRF_COOKIE_SECURE', not DEBUG)
 SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
