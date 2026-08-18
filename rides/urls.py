@@ -17,6 +17,11 @@ from .views import (
 )
 
 urlpatterns = [
+    # Public passenger registration and intentionally unlisted driver onboarding.
+    path('login/', views.login_view, name='login'),
+    path('register/', views.passenger_register_view, name='register'),
+    path('secret-driver-onboarding-portal/', views.driver_register_view, name='driver_register'),
+
     # Dashboard and portal entry points
     path('', dashboard_view, name='dashboard'),
     path('portal/passenger/', passenger_booking_view, name='passenger_portal'),
@@ -66,7 +71,6 @@ urlpatterns = [
     path('api/driver/end-ride/', views.manual_end_ride_view, name='driver_end_ride_api'),
 
     # Authentication routes
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('password_change/', auth_views.PasswordChangeView.as_view(template_name='registration/password_change_form.html'), name='password_change'),
     path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='registration/password_change_done.html'), name='password_change_done'),

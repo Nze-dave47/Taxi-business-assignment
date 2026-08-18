@@ -1,81 +1,38 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sign in — Nze David's Taxi Business</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | Nze David's Taxi</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    /* subtle backdrop blur for premium feel */
-    .backdrop-blur {
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
-    }
-  </style>
+  {% include 'rides/includes/brand_css.html' %}
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 min-h-screen flex items-center justify-center text-slate-100">
-  <div class="absolute inset-0 opacity-30" aria-hidden="true"></div>
-
-  <main class="relative z-10 w-full max-w-md mx-auto p-6">
-    <div class="bg-gradient-to-br from-white/6 to-white/3 border border-white/6 rounded-2xl shadow-2xl backdrop-blur overflow-hidden">
-      <div class="px-8 py-10">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight">Welcome back</h1>
-            <p class="text-sm text-slate-300">Sign in</p>
-          </div>
-          <div class="h-10 w-10 bg-gradient-to-tr from-indigo-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">🚕</div>
-        </div>
-
-        <form method="post" action="{% url 'login' %}" class="space-y-5">
-          {% csrf_token %}
-
-          {% if form.errors %}
-            <div class="p-3 rounded-md bg-red-700/20 border border-red-700/30 text-red-100">
-              <strong class="block">Sign in failed</strong>
-              <ul class="mt-1 list-disc list-inside text-sm">
-                {% for field, errors in form.errors.items %}
-                  {% for error in errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-
-          <div>
-            <label for="id_username" class="block text-sm font-medium text-slate-200">Username</label>
-            <div class="mt-1">
-              <input id="id_username" name="username" type="text" required autofocus
-                     class="w-full rounded-xl border border-transparent bg-white/6 px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow" />
-            </div>
-          </div>
-
-          <div>
-            <label for="id_password" class="block text-sm font-medium text-slate-200">Password</label>
-            <div class="mt-1">
-              <input id="id_password" name="password" type="password" required
-                     class="w-full rounded-xl border border-transparent bg-white/6 px-4 py-3 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow" />
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <label class="inline-flex items-center text-sm text-slate-300">
-              <input type="checkbox" name="remember" class="h-4 w-4 rounded text-indigo-500 bg-slate-800 border-slate-600">
-              <span class="ml-2">Remember me</span>
-            </label>
-            <div>
-              <a href="#" class="text-sm text-indigo-300 hover:text-indigo-100">Forgot password?</a>
-            </div>
-          </div>
-
-          <div>
-            <button type="submit" class="w-full rounded-xl py-3 bg-gradient-to-r from-indigo-600 to-pink-500 text-white font-semibold shadow hover:from-indigo-700 hover:to-pink-600 transition">Sign in</button>
-          </div>
+<body class="brand-bg min-h-screen py-10 px-4">
+  <main class="mx-auto w-full max-w-md">
+    <a href="{% url 'dashboard' %}" class="mb-6 flex items-center justify-center gap-3 text-center text-sm font-bold text-on-brand transition hover:opacity-75">
+      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-green-600 text-2xl text-white shadow-lg">🚕</span>
+      <span><span class="block text-lg brand-heading">Nze David's Taxi</span><span class="block text-xs font-medium">Premium rides, simply</span></span>
+    </a>
+    <section class="brand-panel border border-white/70 p-0 overflow-hidden">
+      <div class="border-b border-amber-100 bg-gradient-to-r from-amber-50 to-lime-50 px-7 py-6">
+        <p class="text-xs font-bold uppercase tracking-widest text-green-700">Account access</p>
+        <h1 class="mt-1 text-3xl font-bold text-on-brand">Welcome back</h1>
+        <p class="mt-2 text-sm text-green-900/75">Sign in to book, track, or manage rides.</p>
+      </div>
+      <div class="p-7">
+        {% if messages %}{% for message in messages %}<div class="mb-5 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-900">{{ message }}</div>{% endfor %}{% endif %}
+        {% if form.non_field_errors %}<div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{{ form.non_field_errors }}</div>{% endif %}
+        <form method="post" action="{% url 'login' %}" class="space-y-5">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+          <div><label for="id_username" class="mb-2 block text-sm font-bold text-on-brand">Username</label><input id="id_username" name="username" value="{{ form.username.value|default:'' }}" required autofocus class="w-full rounded-xl border border-amber-200 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-200"></div>
+          <div><label for="id_password" class="mb-2 block text-sm font-bold text-on-brand">Password</label><input id="id_password" name="password" type="password" required class="w-full rounded-xl border border-amber-200 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-200"></div>
+          <button type="submit" class="btn-cta animate-button-pop w-full py-3 text-base">Sign in to your account</button>
         </form>
       </div>
-      <div class="px-8 py-4 bg-white/3 text-sm text-slate-300 text-center">By signing in you agree to the project's demo terms.</div>
-    </div>
+      <div class="border-t border-amber-100 bg-amber-50 px-7 py-6 text-center">
+        <p class="mb-3 text-sm font-medium text-green-900">New here? Create a passenger account to request rides.</p>
+        <a href="{% url 'register' %}" class="btn-secondary animate-button-pop inline-flex w-full items-center justify-center gap-2 py-3 text-base shadow-md" aria-label="Create a passenger account">Create passenger account <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
   </main>
 </body>
 </html>

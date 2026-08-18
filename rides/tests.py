@@ -4,7 +4,7 @@ import base64
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from .models import UserProfile, Booking
+from .models import UserProfile, Booking, Cab
 from .models import RideAudit
 
 
@@ -137,3 +137,36 @@ class ProfileManagementTests(TestCase):
 
 		user = User.objects.get(pk=self.user.pk)
 		self.assertTrue(user.check_password('newpass456'))
+
+
+class AuthenticationFlowTests(TestCase):
+	def test_passenger_registration_creates_passenger_profile_and_logs_in(self):
+		response = self.client.post(reverse('register'), {
+			'username': 'newpassenger',
+			'first_name': 'New',
+			'last_name': 'Passenger',
+			'email': 'passenger@example.com',
+			'password': 'StrongPass123!',
+			'password_confirm': 'StrongPass123!',
+		})
+		self.assertRedirects(response, reverse('dashboard'))
+		user = User.objects.get(username='newpassenger')
+		self.assertTrue(user.check_password('StrongPass123!'))
+		self.assertEqual(user.profile.role, 'PASSENGER')
+		self.assertFalse(user.profile.is_available)
+
+	def test_hidden_driver_registration_creates_driver_profile_and_cab(self):
+		response = self.client.post(reverse('driver_register'), {
+			'username': 'newdriver',
+			'first_name': 'New',
+			'last_name': 'Driver',
+			'email': 'driver@example.com',
+			'car_model': 'Toyota Camry',
+			'password': 'StrongPass123!',
+			'password_confirm': 'StrongPass123!',
+		})
+		self.assertRedirects(response, reverse('dashboard'))
+		user = User.objects.get(username='newdriver')
+		self.assertEqual(user.profile.role, 'DRIVER')
+		self.assertTrue(user.profile.is_available)
+		self.assertTrue(Cab.objects.filter(driver_name='New Driver', car_model='Toyota Camry').exists())

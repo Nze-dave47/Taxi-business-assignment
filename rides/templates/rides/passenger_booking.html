@@ -27,11 +27,14 @@
         <h1 class="mt-1 text-2xl font-semibold text-white">Book your next ride</h1>
         <p class="text-sm text-slate-400">Choose from trusted drivers ready to take you where you need to go.</p>
       </div>
-      <a href="{% url 'profile_management' %}" class="inline-flex items-center mr-3 rounded-full px-3 py-2 text-sm font-semibold text-white/90 hover:bg-white/25 shadow-md">Manage profile</a>
-      <form method="post" action="{% url 'logout' %}" class="inline">
-        {% csrf_token %}
-        <button type="submit" class="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20">Logout</button>
-      </form>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-2 text-sm font-semibold text-white/90 shadow-md transition hover:bg-white/25">Back to dashboard</a>
+        <a href="{% url 'profile_management' %}" class="inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold text-white/90 hover:bg-white/25 shadow-md">Manage profile</a>
+        <form method="post" action="{% url 'logout' %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20">Logout</button>
+        </form>
+      </div>
     </div>
   </header>
 

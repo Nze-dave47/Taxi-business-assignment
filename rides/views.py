@@ -2,9 +2,12 @@ import json
 from functools import wraps
 
 from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ValidationError
+from django.core.validators import validate_email
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
@@ -20,6 +23,109 @@ from .forms import UserForm, UserProfileForm, SimplePasswordChangeForm
 from io import BytesIO
 from django.http.multipartparser import MultiPartParser
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.password_validation import validate_password
+from django.utils.http import url_has_allowed_host_and_scheme
+
+
+def login_view(request):
+    """Authenticate a user and send them to the taxi dashboard."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    form = AuthenticationForm(request, data=request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        auth_login(request, form.get_user())
+        messages.success(request, f'Welcome back, {request.user.username}.')
+        next_url = request.POST.get('next') or request.GET.get('next')
+        if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}, request.is_secure()):
+            return redirect(next_url)
+        return redirect('dashboard')
+
+    return render(request, 'registration/login.html', {'form': form})
+
+
+def _register_user(request, role, template_name):
+    """Create a role-specific user account from a registration form."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    context = {'values': {}}
+    if request.method != 'POST':
+        return render(request, template_name, context)
+
+    username = request.POST.get('username', '').strip()
+    first_name = request.POST.get('first_name', '').strip()
+    last_name = request.POST.get('last_name', '').strip()
+    email = request.POST.get('email', '').strip()
+    password = request.POST.get('password', '')
+    password_confirm = request.POST.get('password_confirm', '')
+    car_model = request.POST.get('car_model', '').strip()
+    errors = []
+    context['values'] = request.POST
+
+    if not all((username, first_name, last_name, email, password, password_confirm)):
+        errors.append('Please complete every required field.')
+    if password != password_confirm:
+        errors.append('Passwords do not match.')
+    if email:
+        try:
+            validate_email(email)
+        except ValidationError:
+            errors.append('Enter a valid email address.')
+    if username and User.objects.filter(username__iexact=username).exists():
+        errors.append('That username is already in use.')
+    if email and User.objects.filter(email__iexact=email).exists():
+        errors.append('An account already uses that email address.')
+
+    candidate = User(username=username, first_name=first_name, last_name=last_name, email=email)
+    if not errors:
+        try:
+            candidate.full_clean(exclude=['password'])
+            validate_password(password, user=candidate)
+        except ValidationError as exc:
+            errors.extend(exc.messages)
+
+    if errors:
+        context['errors'] = errors
+        return render(request, template_name, context)
+
+    with transaction.atomic():
+        user = User.objects.create_user(
+            username=username, first_name=first_name, last_name=last_name,
+            email=email, password=password,
+        )
+        # The existing User post-save signal creates a passenger profile; update its role safely.
+        profile, _ = UserProfile.objects.get_or_create(user=user, defaults={'role': role})
+        profile.role = role
+        profile.is_available = role == 'DRIVER'
+        profile.save(update_fields=['role', 'is_available'])
+
+        # Cab has no User foreign key, so it records the driver's display name.
+        if role == 'DRIVER' and car_model:
+            Cab.objects.create(
+                driver_name=user.get_full_name() or user.username,
+                car_model=car_model,
+                status='AVAILABLE',
+            )
+
+    auth_user = authenticate(request, username=username, password=password)
+    if auth_user is not None:
+        auth_login(request, auth_user)
+        messages.success(request, 'Your account has been created successfully.')
+        return redirect('dashboard')
+
+    messages.success(request, 'Your account has been created. Please sign in.')
+    return redirect('login')
+
+
+def passenger_register_view(request):
+    """Public registration endpoint: every account created here is a passenger."""
+    return _register_user(request, 'PASSENGER', 'registration/passenger_register.html')
+
+
+def driver_register_view(request):
+    """Unlisted driver onboarding endpoint, intentionally absent from public navigation."""
+    return _register_user(request, 'DRIVER', 'registration/driver_register.html')
 
 
 def get_driver_profile(user):
