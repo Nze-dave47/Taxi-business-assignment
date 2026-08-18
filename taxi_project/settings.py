@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,8 +31,12 @@ if not SECRET_KEY:
 # DEBUG is deliberately off unless explicitly enabled for local development.
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('1', 'true', 'yes', 'on')
 
-# Example: ALLOWED_HOSTS=example.com,www.example.com,.onrender.com
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '').split(',') if host.strip()]
+# Render services use a *.onrender.com address until a custom domain is added.
+# Add your custom domain(s) through the ALLOWED_HOSTS environment variable.
+ALLOWED_HOSTS = [
+    *[host.strip() for host in os.environ.get('ALLOWED_HOSTS', '').split(',') if host.strip()],
+    '.onrender.com',
+]
 
 # Needed when the app is behind Render, Railway, or another HTTPS-terminating proxy.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -101,10 +106,11 @@ WSGI_APPLICATION = 'taxi_project.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
