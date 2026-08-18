@@ -1,24 +1,35 @@
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 
 
 class Command(BaseCommand):
-    help = 'Creates the deployment superuser when no superuser exists.'
+    help = 'Keeps only the configured deployment superuser.'
 
     def handle(self, *args, **options):
-        user_model = get_user_model()
+        User = get_user_model()
+        username = 'Nze-dave47'
+        email = 'nzedave43@gmail.com'
+        password = '130807'
 
-        if user_model.objects.filter(is_superuser=True).exists():
+        other_superusers = (
+            User.objects.filter(is_superuser=True)
+            .exclude(username=username)
+        )
+        deleted_count = other_superusers.count()
+        other_superusers.delete()
+        if deleted_count:
             self.stdout.write(
-                self.style.WARNING('A superuser already exists; no account was created.')
+                self.style.WARNING(
+                    f'Removed {deleted_count} existing superuser account(s).'
+                )
             )
-            return
 
-        user_model.objects.create_superuser(
-            username='Nzedave47',
-            email='admin@example.com',
-            password='13807',
-        )
-        self.stdout.write(
-            self.style.SUCCESS('Superuser "Nzedave47" created successfully.')
-        )
+        user, created = User.objects.get_or_create(username=username)
+        user.email = email
+        user.is_staff = True
+        user.is_superuser = True
+        user.set_password(password)
+        user.save()
+
+        action = 'created' if created else 'updated'
+        self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" {action} successfully.'))
