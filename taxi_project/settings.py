@@ -40,7 +40,9 @@ ALLOWED_HOSTS = [
 
 # Needed when the app is behind Render, Railway, or another HTTPS-terminating proxy.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').lower() in ('1', 'true', 'yes', 'on')
+SECURE_SSL_REDIRECT = os.environ.get(
+    'SECURE_SSL_REDIRECT', str(not DEBUG)
+).lower() in ('1', 'true', 'yes', 'on')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000'))
@@ -154,6 +156,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },

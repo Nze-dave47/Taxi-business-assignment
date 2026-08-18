@@ -65,6 +65,10 @@ def _register_user(request, role, template_name):
 
     if not all((username, first_name, last_name, email, password, password_confirm)):
         errors.append('Please complete every required field.')
+    if username and not username.strip():
+        errors.append('Username cannot contain only spaces.')
+    if len(username) > 150:
+        errors.append('Username must be 150 characters or fewer.')
     if password != password_confirm:
         errors.append('Passwords do not match.')
     if email:
@@ -80,7 +84,9 @@ def _register_user(request, role, template_name):
     candidate = User(username=username, first_name=first_name, last_name=last_name, email=email)
     if not errors:
         try:
-            candidate.full_clean(exclude=['password'])
+            # Django's default username validator disallows spaces and some text
+            # characters. The database still enforces the 150-character limit.
+            candidate.full_clean(exclude=['username', 'password'])
             validate_password(password, user=candidate)
         except ValidationError as exc:
             errors.extend(exc.messages)

@@ -170,3 +170,16 @@ class AuthenticationFlowTests(TestCase):
 		self.assertEqual(user.profile.role, 'DRIVER')
 		self.assertTrue(user.profile.is_available)
 		self.assertTrue(Cab.objects.filter(driver_name='New Driver', car_model='Toyota Camry').exists())
+
+	def test_registration_allows_spaces_in_username(self):
+		username = 'Passenger With Spaces'
+		response = self.client.post(reverse('register'), {
+			'username': username,
+			'first_name': 'Space',
+			'last_name': 'Passenger',
+			'email': 'spaces@example.com',
+			'password': 'StrongPass123!',
+			'password_confirm': 'StrongPass123!',
+		})
+		self.assertRedirects(response, reverse('dashboard'))
+		self.assertTrue(User.objects.filter(username=username).exists())
