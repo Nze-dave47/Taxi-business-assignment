@@ -51,12 +51,15 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# Set this where the host uses a custom domain or cross-origin form posts.
-# Example: CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com
+# The deployed Render URL must include its https:// scheme for Django CSRF checks.
+# Add custom domains through CSRF_TRUSTED_ORIGINS in the host environment.
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
-    if origin.strip()
+    'https://nzedave47-taxi-biz.onrender.com',
+    *[
+        origin.strip()
+        for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+        if origin.strip()
+    ],
 ]
 
 
